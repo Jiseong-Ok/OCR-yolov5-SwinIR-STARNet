@@ -69,7 +69,7 @@ def sr(sr_model_path, image, scale = 4, window_size=8):
         w_pad = (w_old // window_size + 1) * window_size - w_old
         img_lq = torch.cat([img_lq, torch.flip(img_lq, [2])], 2)[:, :, :h_old + h_pad, :]
         img_lq = torch.cat([img_lq, torch.flip(img_lq, [3])], 3)[:, :, :, :w_old + w_pad]
-        output = model(img_lq)   # test로 예측한다 -> 살펴보기( ) -> tile이 None일때(기본값) 이렇게 예측
+        output = model(img_lq) 
         output = output[..., :h_old * scale, :w_old * scale]
 
     # save image
@@ -87,7 +87,7 @@ def itt(itt_model_path, batch_max_length, batch_size, imgW, imgH, character, ima
     if itt_model_path is None:
       
       url = "https://drive.google.com/uc?id=1-YU62Q-yIap3yg6u7CCulP58fLS0QdZR"
-      output = "best_norm_ED.pth"
+      output = "best_recognition.pth"
 
       if not os.path.exists('/content/OCR-yolov5-SwinIR-STARNet/pt_models/'+output):
         
@@ -99,7 +99,7 @@ def itt(itt_model_path, batch_max_length, batch_size, imgW, imgH, character, ima
       itt_model_path = itt_model_path
 
     image=Image.fromarray(image)
-    transform = ResizeNormalize((imgW, imgH)) #imgW, imgH 가 size라는 변수로 들어감
+    transform = ResizeNormalize((imgW, imgH)) 
     image_tensors = transform(image)
     image_tensors = image_tensors.reshape(-1, 1, imgH, imgW)
 
@@ -126,14 +126,11 @@ def itt(itt_model_path, batch_max_length, batch_size, imgW, imgH, character, ima
 
 
 def yolov5s_detect(yolo_model_path, image) :
-    # !gdown --id 10xmrzFfeRjVUWGS9onsuDkLrrRylrhLw
-    # path = '/content/best.pt'
-    # model = torch.hub.load('ultralytics/yolov5', 'custom', path=path)
 
     if yolo_model_path is None:
       
       url = "https://drive.google.com/uc?id=10xmrzFfeRjVUWGS9onsuDkLrrRylrhLw"
-      output = "best.pt"
+      output = "best_detection.pt"
 
       if not os.path.exists('/content/OCR-yolov5-SwinIR-STARNet/pt_models/'+output):
         
@@ -191,15 +188,8 @@ def img_blur_text(font_path, image, bboxs, texts, mag=30):
       
     else:
       font_path = font_path
-
-
-    #   img = Image.open(image).convert('RGB')
-    #   blurI = img.filter(ImageFilter.GaussianBlur(50))
-
     
     img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
-  
     
     for bbox, text in zip(bboxs, texts):
         x = int(bbox[0])
