@@ -28,21 +28,21 @@ from model import TPS_SpatialTransformerNetwork, LocalizationNetwork, GridGenera
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-def sr(opt.sr_model_path, image, scale = 4):
+def sr(sr_model_path, image, scale = 4):
 
-    if opt.sr_model_path is None:
+    if sr_model_path is None:
       
       url = "https://drive.google.com/uc?id=1d1RwNhiyxVu7zkNcIReifcyg5wkVc-xv"
       output = "003_realSR_BSRGAN_DFOWMFC_s64w8_SwinIR-L_x4_GAN.pth"
 
       if not os.path.exists('/content/'+output):
         
-        opt.sr_model_path = gdown.download(url, output, quiet=False)
-      opt.sr_model_path = '/content/'+output
+        sr_model_path = gdown.download(url, output, quiet=False)
+      sr_model_path = '/content/'+output
       
         
     else:
-      opt.sr_model_path = opt.sr_model_path
+      sr_model_path = sr_model_path
 
     img_lq = image.astype(np.float32) / 255.
     img_lq = np.transpose(img_lq if img_lq.shape[2] == 1 else img_lq[:, :, [2, 1, 0]], (2, 0, 1))  # HCW-BGR to CHW-RGB
@@ -56,7 +56,7 @@ def sr(opt.sr_model_path, image, scale = 4):
                             mlp_ratio=2, upsampler='nearest+conv', resi_connection='3conv')
     param_key_g = 'params_ema'
 
-    pretrained_model = torch.load(opt.sr_model_path)
+    pretrained_model = torch.load(sr_model_path)
     model.load_state_dict(pretrained_model[param_key_g] if param_key_g in pretrained_model.keys() else pretrained_model, strict=True)
 
     model.eval()
@@ -82,9 +82,9 @@ def sr(opt.sr_model_path, image, scale = 4):
 
 
 
-def itt(opt.itt_model_path, opt.batch_max_length, opt.batch_size, opt.imgW, opt.imgH, opt.character, image):
+def itt(itt_model_path, batch_max_length, batch_size, imgW, imgH, character, image):
 
-    if opt.itt_model_path is None:
+    if itt_model_path is None:
       
       url = "https://drive.google.com/uc?id=1-YU62Q-yIap3yg6u7CCulP58fLS0QdZR"
       output = "best_norm_ED.pth"
@@ -96,12 +96,12 @@ def itt(opt.itt_model_path, opt.batch_max_length, opt.batch_size, opt.imgW, opt.
       
         
     else:
-      itt_model_path = opt.itt_model_path
+      itt_model_path = itt_model_path
 
     image=Image.fromarray(image)
-    transform = ResizeNormalize((opt.imgW, opt.imgH)) #imgW, imgH 가 size라는 변수로 들어감
+    transform = ResizeNormalize((imgW, imgH)) #imgW, imgH 가 size라는 변수로 들어감
     image_tensors = transform(image)
-    image_tensors = image_tensors.reshape(-1, 1, opt.imgH, opt.imgW)
+    image_tensors = image_tensors.reshape(-1, 1, imgH, imgW)
 
     model = Model()
     model = torch.nn.DataParallel(model).to(device)
@@ -109,14 +109,14 @@ def itt(opt.itt_model_path, opt.batch_max_length, opt.batch_size, opt.imgW, opt.
     model.load_state_dict(torch.load(itt_model_path, map_location=device))
     model.eval()
 
-    converter = CTCLabelConverter(opt.character)
+    converter = CTCLabelConverter(character)
 
     with torch.no_grad():
         image = image_tensors.to(device)
-        text_for_pred = torch.LongTensor(opt.batch_size, opt.batch_max_length + 1).fill_(0).to(device)
+        text_for_pred = torch.LongTensor(batch_size, batch_max_length + 1).fill_(0).to(device)
 
         preds = model(image, text_for_pred)
-        preds_size = torch.IntTensor([preds.size(1)] * opt.batch_size)
+        preds_size = torch.IntTensor([preds.size(1)] * batch_size)
         _, preds_index = preds.max(2)
         # preds_index = preds_index.view(-1)
         preds_str = converter.decode(preds_index, preds_size)   
@@ -125,12 +125,12 @@ def itt(opt.itt_model_path, opt.batch_max_length, opt.batch_size, opt.imgW, opt.
 
 
 
-def yolov5s_detect(opt.yolo_model_path, image) :
+def yolov5s_detect(yolo_model_path, image) :
     # !gdown --id 10xmrzFfeRjVUWGS9onsuDkLrrRylrhLw
     # path = '/content/best.pt'
     # model = torch.hub.load('ultralytics/yolov5', 'custom', path=path)
 
-    if opt.yolo_model_path is None:
+    if yolo_model_path is None:
       
       url = "https://drive.google.com/uc?id=10xmrzFfeRjVUWGS9onsuDkLrrRylrhLw"
       output = "best.pt"
@@ -177,9 +177,9 @@ def yolov5s_detect(opt.yolo_model_path, image) :
 
 
 
-def img_blur_text(opt.font_path, image, bboxs, texts, mag=30):
+def img_blur_text(font_path, image, bboxs, texts, mag=30):
   
-    if opt.font_path is None:
+    if font_path is None:
       
       url = "https://drive.google.com/uc?id=17IK1YuODQxjJDQtVEqOF22EtvDh37wUs"
       output = "NanumBarunGothic.ttf"
