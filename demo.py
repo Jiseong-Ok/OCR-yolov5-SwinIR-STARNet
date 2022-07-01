@@ -21,7 +21,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from swinir import swinIR
+from swinir import SwinIR
 from model import TPS_SpatialTransformerNetwork, LocalizationNetwork, GridGenerator, BasicBlock, ResNet, ResNet_FeatureExtractor, CTCLabelConverter, BidirectionalLSTM, Model, ResizeNormalize
 
 
