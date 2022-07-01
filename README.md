@@ -4,11 +4,19 @@ OCR(Korean)
 
 Run demo
 ---------------------------------------------------------------------
-1. !pip install timm
+- Requirement
+!pip install timm
 
-2. !CUDA_VISIBLE_DEVICES=0 python3 demo.py --image_path /content/1.jpg(example)
+- Run demo.py
+!CUDA_VISIBLE_DEVICES=0 python3 demo.py --image_path /content/1.jpg(example)
 
-3. The result will be created in './demo.jpg'
+- Result
+The result will be created in './demo.jpg'
+
+![화면 캡처 2022-07-01 132858](https://user-images.githubusercontent.com/106142675/176823623-75577035-8665-422f-98d6-e2c7ef6a6585.png)      ![화면 캡처 2022-07-01 132914](https://user-images.githubusercontent.com/106142675/176823644-3c561dd8-2f12-4491-becf-27a649b7b623.png)
+
+![화면 캡처 2022-07-01 132928](https://user-images.githubusercontent.com/106142675/176823718-f1feb1e7-1b06-470a-9953-504434193c87.png)
+![화면 캡처 2022-07-01 132943](https://user-images.githubusercontent.com/106142675/176823734-b1041d80-7b77-4e39-89b4-447fc23dc0f5.png)
 
 Reference
 ---------------------------------------------------------------------
