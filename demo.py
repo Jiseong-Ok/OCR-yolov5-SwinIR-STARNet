@@ -247,8 +247,8 @@ def demo(opt):
 
     img_t = img_blur_text(opt.font_path, image=img, bboxs=bboxs, texts=texts)
 
-    plt.imshow(img_t)
-    plt.show()
+    cv2.imwrite('./demo.jpg', img_t)
+    
 
 
 
