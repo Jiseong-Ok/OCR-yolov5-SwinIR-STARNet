@@ -28,7 +28,7 @@ from model import TPS_SpatialTransformerNetwork, LocalizationNetwork, GridGenera
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-def sr(image, scale = 4, opt.sr_model_path):
+def sr(image, scale = 4, opt):
 
     if opt.sr_model_path is None:
       
@@ -82,7 +82,7 @@ def sr(image, scale = 4, opt.sr_model_path):
 
 
 
-def itt(image, opt.itt_model_path, opt.batch_max_length, opt.batch_size, opt.imgW, opt.imgH, opt.character):
+def itt(image, opt):
 
     if opt.itt_model_path is None:
       
@@ -125,7 +125,7 @@ def itt(image, opt.itt_model_path, opt.batch_max_length, opt.batch_size, opt.img
 
 
 
-def yolov5s_detect(img, opt.yolo_model_path) :
+def yolov5s_detect(img, opt) :
     # !gdown --id 10xmrzFfeRjVUWGS9onsuDkLrrRylrhLw
     # path = '/content/best.pt'
     # model = torch.hub.load('ultralytics/yolov5', 'custom', path=path)
@@ -177,7 +177,7 @@ def yolov5s_detect(img, opt.yolo_model_path) :
 
 
 
-def img_blur_text(image, bboxs, texts, mag=30, opt.font_path):
+def img_blur_text(image, bboxs, texts, mag=30, opt):
   
     if opt.font_path is None:
       
