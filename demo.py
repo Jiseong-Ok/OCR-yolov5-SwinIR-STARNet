@@ -125,7 +125,7 @@ def itt(opt, image):
 
 
 
-def yolov5s_detect(opt, img) :
+def yolov5s_detect(opt, image) :
     # !gdown --id 10xmrzFfeRjVUWGS9onsuDkLrrRylrhLw
     # path = '/content/best.pt'
     # model = torch.hub.load('ultralytics/yolov5', 'custom', path=path)
@@ -146,7 +146,7 @@ def yolov5s_detect(opt, img) :
     model = torch.hub.load('ultralytics/yolov5', 'custom', path=yolo_model_path)
 
 
-    data_img = img
+    data_img = image
 
     results = model(data_img)
     print('탐지된 이미지의 수 : ',len(results.xyxy[0]))
@@ -165,7 +165,7 @@ def yolov5s_detect(opt, img) :
         for y in range(output.shape[1]):
             for x in range(output.shape[0]):
                 xp, yp = x + start[0], y+start[1]
-                output[x,y] = img[xp,yp]
+                output[x,y] = image[xp,yp]
 
         # crop image
         crop_image = np.asarray(output)
@@ -237,12 +237,12 @@ def img_blur_text(opt, image, bboxs, texts, mag=30):
 def demo(opt):
 
     img = cv2.imread(opt.image_path)
-    crop_images, bboxs = yolov5s_detect(img)
+    crop_images, bboxs = yolov5s_detect(image = img)
 
     texts = []
     for crop_image in crop_images:
-        sr_img = sr(crop_image)
-        text = itt(sr_img)
+        sr_img = sr(image = crop_image)
+        text = itt(image = sr_img)
         texts.append(text)
 
     img_t = img_blur_text(image=img, bboxs=bboxs, texts=texts)
