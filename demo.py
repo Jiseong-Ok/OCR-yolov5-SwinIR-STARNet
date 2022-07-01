@@ -35,10 +35,10 @@ def sr(sr_model_path, image, scale = 4, window_size=8):
       url = "https://drive.google.com/uc?id=1d1RwNhiyxVu7zkNcIReifcyg5wkVc-xv"
       output = "003_realSR_BSRGAN_DFOWMFC_s64w8_SwinIR-L_x4_GAN.pth"
 
-      if not os.path.exists('/content/OCR-yolov5-SwinIR-STARNet/'+output):
+      if not os.path.exists('/content/OCR-yolov5-SwinIR-STARNet/pt_models/'+output):
         
-        sr_model_path = gdown.download(url, output, quiet=False)
-      sr_model_path = '/content/OCR-yolov5-SwinIR-STARNet/'+output
+        sr_model_path = gdown.download(url, './pt_models/'+output, quiet=False)
+      sr_model_path = '/content/OCR-yolov5-SwinIR-STARNet/pt_models/'+output
       
         
     else:
@@ -89,10 +89,10 @@ def itt(itt_model_path, batch_max_length, batch_size, imgW, imgH, character, ima
       url = "https://drive.google.com/uc?id=1-YU62Q-yIap3yg6u7CCulP58fLS0QdZR"
       output = "best_norm_ED.pth"
 
-      if not os.path.exists('/content/OCR-yolov5-SwinIR-STARNet/'+output):
+      if not os.path.exists('/content/OCR-yolov5-SwinIR-STARNet/pt_models/'+output):
         
-        itt_model_path = gdown.download(url, output, quiet=False)
-      itt_model_path = '/content/OCR-yolov5-SwinIR-STARNet/'+output
+        itt_model_path = gdown.download(url, './pt_models/'+output, quiet=False)
+      itt_model_path = '/content/OCR-yolov5-SwinIR-STARNet/pt_models/'+output
       
         
     else:
@@ -135,10 +135,10 @@ def yolov5s_detect(yolo_model_path, image) :
       url = "https://drive.google.com/uc?id=10xmrzFfeRjVUWGS9onsuDkLrrRylrhLw"
       output = "best.pt"
 
-      if not os.path.exists('/content/OCR-yolov5-SwinIR-STARNet/'+output):
+      if not os.path.exists('/content/OCR-yolov5-SwinIR-STARNet/pt_models/'+output):
         
-        yolo_model_path = gdown.download(url, output, quiet=False)
-      yolo_model_path = '/content/OCR-yolov5-SwinIR-STARNet/'+output
+        yolo_model_path = gdown.download(url, './pt_models/'+output, quiet=False)
+      yolo_model_path = '/content/OCR-yolov5-SwinIR-STARNet/pt_models/'+output
       
     else:
       yolo_model_path = yolo_model_path
@@ -184,10 +184,10 @@ def img_blur_text(font_path, image, bboxs, texts, mag=30):
       url = "https://drive.google.com/uc?id=17IK1YuODQxjJDQtVEqOF22EtvDh37wUs"
       output = "NanumBarunGothic.ttf"
 
-      if not os.path.exists('/content/OCR-yolov5-SwinIR-STARNet/'+output):
+      if not os.path.exists('/content/OCR-yolov5-SwinIR-STARNet/pt_models/'+output):
         
-        font_path = gdown.download(url, output, quiet=False)
-      font_path = '/content/OCR-yolov5-SwinIR-STARNet/'+output
+        font_path = gdown.download(url, './pt_models/'+output, quiet=False)
+      font_path = '/content/OCR-yolov5-SwinIR-STARNet/pt_models/'+output
       
     else:
       font_path = font_path
@@ -236,26 +236,35 @@ def img_blur_text(font_path, image, bboxs, texts, mag=30):
 
 def demo(opt):
 
-    img = cv2.imread(opt.image_path)
-    crop_images, bboxs = yolov5s_detect(opt.yolo_model_path, image = img)
-
-    texts = []
-    for crop_image in crop_images:
-        sr_img = sr(opt.sr_model_path, image = crop_image)
-        text = itt(opt.itt_model_path, opt.batch_max_length, opt.batch_size, opt.imgW, opt.imgH, opt.character, image = sr_img)
-        texts.append(text)
-
-    img_t = img_blur_text(opt.font_path, image=img, bboxs=bboxs, texts=texts)
+    result_path = '/content/OCR-yolov5-SwinIR-STARNet/results'
     
-    img_t = cv2.cvtColor(img_t, cv2.COLOR_BGR2RGB)
-    cv2.imwrite('./demo.jpg', img_t)
+    try:
+        if not os.path.exists(result_path):
+            os.makedirs(result_path)
+    except OSError:
+        print("Error: Failed to create the directory.")
+
+    for file_name in os.listdir(opt.image_folder):
+        img = cv2.imread(opt.image_folder+'/'+file_name)
+        crop_images, bboxs = yolov5s_detect(opt.yolo_model_path, image = img)
+
+        texts = []
+        for crop_image in crop_images:
+            sr_img = sr(opt.sr_model_path, image = crop_image)
+            text = itt(opt.itt_model_path, opt.batch_max_length, opt.batch_size, opt.imgW, opt.imgH, opt.character, image = sr_img)
+            texts.append(text)
+
+        img_t = img_blur_text(opt.font_path, image=img, bboxs=bboxs, texts=texts)
+        
+        img_t = cv2.cvtColor(img_t, cv2.COLOR_BGR2RGB)
+        cv2.imwrite(f'./results/'+file_name, img_t)
     
 
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--image_path', required=True, help='path to image which contains text images')
+    parser.add_argument('--image_folder', required=True, help='path to image_folder which contains text images')
     parser.add_argument('--workers', type=int, help='number of data loading workers', default=4)
     parser.add_argument('--batch_size', type=int, default=1, help='input batch size')
     """ Data processing """
