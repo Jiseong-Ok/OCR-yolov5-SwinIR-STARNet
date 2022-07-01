@@ -28,7 +28,7 @@ from model import TPS_SpatialTransformerNetwork, LocalizationNetwork, GridGenera
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-def sr(sr_model_path, image, scale = 4):
+def sr(sr_model_path, image, scale = 4, window_size=8):
 
     if sr_model_path is None:
       
