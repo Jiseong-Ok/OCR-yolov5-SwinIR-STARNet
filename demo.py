@@ -246,7 +246,8 @@ def demo(opt):
         texts.append(text)
 
     img_t = img_blur_text(opt.font_path, image=img, bboxs=bboxs, texts=texts)
-
+    
+    img_t = cv2.cvtColor(img_t, cv2.COLOR_BGR2RGB)
     cv2.imwrite('./demo.jpg', img_t)
     
 
