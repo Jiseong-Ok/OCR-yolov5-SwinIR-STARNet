@@ -28,7 +28,7 @@ from model import TPS_SpatialTransformerNetwork, LocalizationNetwork, GridGenera
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-def sr(opt, image, scale = 4):
+def sr(opt.sr_model_path, image, scale = 4):
 
     if opt.sr_model_path is None:
       
@@ -82,7 +82,7 @@ def sr(opt, image, scale = 4):
 
 
 
-def itt(opt, image):
+def itt(opt.itt_model_path, opt.batch_max_length, opt.batch_size, opt.imgW, opt.imgH, opt.character, image):
 
     if opt.itt_model_path is None:
       
@@ -125,7 +125,7 @@ def itt(opt, image):
 
 
 
-def yolov5s_detect(opt, image) :
+def yolov5s_detect(opt.yolo_model_path, image) :
     # !gdown --id 10xmrzFfeRjVUWGS9onsuDkLrrRylrhLw
     # path = '/content/best.pt'
     # model = torch.hub.load('ultralytics/yolov5', 'custom', path=path)
@@ -177,7 +177,7 @@ def yolov5s_detect(opt, image) :
 
 
 
-def img_blur_text(opt, image, bboxs, texts, mag=30):
+def img_blur_text(opt.font_path, image, bboxs, texts, mag=30):
   
     if opt.font_path is None:
       
@@ -237,15 +237,15 @@ def img_blur_text(opt, image, bboxs, texts, mag=30):
 def demo(opt):
 
     img = cv2.imread(opt.image_path)
-    crop_images, bboxs = yolov5s_detect(image = img)
+    crop_images, bboxs = yolov5s_detect(opt.yolo_model_path, image = img)
 
     texts = []
     for crop_image in crop_images:
-        sr_img = sr(image = crop_image)
-        text = itt(image = sr_img)
+        sr_img = sr(opt.sr_model_path, image = crop_image)
+        text = itt(opt.itt_model_path, opt.batch_max_length, opt.batch_size, opt.imgW, opt.imgH, opt.character, image = sr_img)
         texts.append(text)
 
-    img_t = img_blur_text(image=img, bboxs=bboxs, texts=texts)
+    img_t = img_blur_text(opt.font_path, image=img, bboxs=bboxs, texts=texts)
 
     plt.imshow(img_t)
     plt.show()
