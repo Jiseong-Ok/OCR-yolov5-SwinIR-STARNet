@@ -10,11 +10,11 @@ Run demo
 
 - Run demo.py
 
-  !CUDA_VISIBLE_DEVICES=0 python3 demo.py --image_path /content/1.jpg(example)
+  !CUDA_VISIBLE_DEVICES=0 python3 demo.py --image_folder /content/OCR-yolov5-SwinIR-STARNet/img_demo
 
 - Result
 
-  The result will be saved in './demo.jpg'
+  The result will be saved in './results'
 
 ![화면 캡처 2022-07-01 132858](https://user-images.githubusercontent.com/106142675/176823623-75577035-8665-422f-98d6-e2c7ef6a6585.png)      ![화면 캡처 2022-07-01 132914](https://user-images.githubusercontent.com/106142675/176823644-3c561dd8-2f12-4491-becf-27a649b7b623.png)
 
