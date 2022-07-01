@@ -7,7 +7,7 @@ Original file is located at
     https://colab.research.google.com/drive/1MW_nbzBaoyoZYQ9p5B8DWQdFh34Z2s8S
 """
 
-from PIL import Image
+from PIL import Image, ImageDraw,ImageFilter, ImageFont
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
