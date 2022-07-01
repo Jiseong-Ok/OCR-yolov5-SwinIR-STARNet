@@ -35,10 +35,10 @@ def sr(sr_model_path, image, scale = 4):
       url = "https://drive.google.com/uc?id=1d1RwNhiyxVu7zkNcIReifcyg5wkVc-xv"
       output = "003_realSR_BSRGAN_DFOWMFC_s64w8_SwinIR-L_x4_GAN.pth"
 
-      if not os.path.exists('/content/'+output):
+      if not os.path.exists('/content/OCR-yolov5-SwinIR-STARNet/'+output):
         
         sr_model_path = gdown.download(url, output, quiet=False)
-      sr_model_path = '/content/'+output
+      sr_model_path = '/content/OCR-yolov5-SwinIR-STARNet/'+output
       
         
     else:
@@ -89,10 +89,10 @@ def itt(itt_model_path, batch_max_length, batch_size, imgW, imgH, character, ima
       url = "https://drive.google.com/uc?id=1-YU62Q-yIap3yg6u7CCulP58fLS0QdZR"
       output = "best_norm_ED.pth"
 
-      if not os.path.exists('/content/'+output):
+      if not os.path.exists('/content/OCR-yolov5-SwinIR-STARNet/'+output):
         
         itt_model_path = gdown.download(url, output, quiet=False)
-      itt_model_path = '/content/'+output
+      itt_model_path = '/content/OCR-yolov5-SwinIR-STARNet/'+output
       
         
     else:
@@ -135,10 +135,10 @@ def yolov5s_detect(yolo_model_path, image) :
       url = "https://drive.google.com/uc?id=10xmrzFfeRjVUWGS9onsuDkLrrRylrhLw"
       output = "best.pt"
 
-      if not os.path.exists('/content/'+output):
+      if not os.path.exists('/content/OCR-yolov5-SwinIR-STARNet/'+output):
         
         yolo_model_path = gdown.download(url, output, quiet=False)
-      yolo_model_path = '/content/'+output
+      yolo_model_path = '/content/OCR-yolov5-SwinIR-STARNet/'+output
       
     else:
       yolo_model_path = yolo_model_path
@@ -184,10 +184,10 @@ def img_blur_text(font_path, image, bboxs, texts, mag=30):
       url = "https://drive.google.com/uc?id=17IK1YuODQxjJDQtVEqOF22EtvDh37wUs"
       output = "NanumBarunGothic.ttf"
 
-      if not os.path.exists('/content/'+output):
+      if not os.path.exists('/content/OCR-yolov5-SwinIR-STARNet/'+output):
         
         font_path = gdown.download(url, output, quiet=False)
-      font_path = '/content/'+output
+      font_path = '/content/OCR-yolov5-SwinIR-STARNet/'+output
       
     else:
       font_path = font_path
