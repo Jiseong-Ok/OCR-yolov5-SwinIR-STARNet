@@ -130,8 +130,8 @@ def yolov5s_detect(yolo_model_path, image) :
 
     if yolo_model_path is None:
       
-      url = "https://drive.google.com/uc?id=10xmrzFfeRjVUWGS9onsuDkLrrRylrhLw"
-      output = "best_detection.pt"
+      url = "https://drive.google.com/uc?id=10QsgZtVycx7i_6QtW_ly_NXZrTkVIPut"
+      output = "yolov5l_detection.pt"
 
       if not os.path.exists('/content/OCR-yolov5-SwinIR-STARNet/pt_models/'+output):
         
@@ -142,7 +142,8 @@ def yolov5s_detect(yolo_model_path, image) :
       yolo_model_path = yolo_model_path
 
     model = torch.hub.load('ultralytics/yolov5', 'custom', path=yolo_model_path)
-
+    model.conf = 0.001
+    model.iou = 0.001
 
     data_img = image
 
