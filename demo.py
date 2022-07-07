@@ -14,6 +14,7 @@ import numpy as np
 import os
 import gdown
 import urllib.request
+import time
 
 import string
 import argparse
@@ -147,7 +148,7 @@ def yolov5s_detect(yolo_model_path, image) :
 
     data_img = image
 
-    results = model(data_img)
+    results = model(data_img, size = 640)
     print('탐지된 이미지의 수 : ',len(results.xyxy[0]))
     
     crop_images = []
@@ -258,18 +259,37 @@ def demo(opt):
 
     for file_name in os.listdir(opt.image_folder):
         img = cv2.imread(opt.image_folder+'/'+file_name)
+        start = time.time()
         crop_images, bboxs = yolov5s_detect(opt.yolo_model_path, image = img)
+        end = time.time()
+        text_detection = (end-start)
+        super_resolution = 0
+        text_recognition = 0
+
 
         texts = []
         for crop_image in crop_images:
+            start = time.time()
             sr_img = sr(opt.sr_model_path, image = crop_image)
+            end = time.time()
+            super_resolution+=(end-start)
+
+            start = time.time()
             text = itt(opt.itt_model_path, opt.batch_max_length, opt.batch_size, opt.imgW, opt.imgH, opt.character, image = sr_img)
+            end = time.time()
+            text_recognition+=(end-start)
+
             texts.append(text)
 
         img_t = img_blur_text(opt.font_path, image=img, bboxs=bboxs, texts=texts)
         
         img_t = cv2.cvtColor(img_t, cv2.COLOR_BGR2RGB)
         cv2.imwrite(f'./results/'+file_name, img_t)
+
+        print(f"Text Detection Spend Time : { text_detection :.5f} sec")
+        print(f"Super Resolution Spend Time : { super_resolution :.5f} sec")
+        print(f"Text Recognition Spend Time : { text_recognition :.5f} sec")
+
     
 
 
