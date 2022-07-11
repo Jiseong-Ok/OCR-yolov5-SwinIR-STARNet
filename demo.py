@@ -30,17 +30,17 @@ from model import TPS_SpatialTransformerNetwork, LocalizationNetwork, GridGenera
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-def sr(sr_model_path, image, scale = 4, window_size=8):
+def sr(sr_model_path, image, scale = 2, window_size=8):
 
     if sr_model_path is None:
       
-      url = "https://drive.google.com/uc?id=1d1RwNhiyxVu7zkNcIReifcyg5wkVc-xv"
-      output = "003_realSR_BSRGAN_DFOWMFC_s64w8_SwinIR-L_x4_GAN.pth"
+      url = "https://drive.google.com/uc?id=1RfN1HefvnF75p7fWy7cQRMrJquQvLjL0"
+      output = "003_realSR_BSRGAN_DFO_s64w8_SwinIR-M_x2_GAN"
 
-      if not os.path.exists('/content/OCR-yolov5-SwinIR-STARNet/pt_models/'+output):
+      if not os.path.exists('/content/OCR-Yolov5-SwinIR-SVTR/pt_models/'+output):
         
         sr_model_path = gdown.download(url, './pt_models/'+output, quiet=False)
-      sr_model_path = '/content/OCR-yolov5-SwinIR-STARNet/pt_models/'+output
+      sr_model_path = '/content/OCR-Yolov5-SwinIR-SVTR/pt_models/'+output
       
         
     else:
@@ -53,9 +53,9 @@ def sr(sr_model_path, image, scale = 4, window_size=8):
     
     
     model = SwinIR(upscale=scale, in_chans=3, img_size=64, window_size=8,
-                            img_range=1., depths=[6, 6, 6, 6, 6, 6, 6, 6, 6], embed_dim=240,
-                            num_heads=[8, 8, 8, 8, 8, 8, 8, 8, 8],
-                            mlp_ratio=2, upsampler='nearest+conv', resi_connection='3conv')
+                            img_range=1., depths=[6, 6, 6, 6, 6, 6], embed_dim=180, 
+                            num_heads=[6, 6, 6, 6, 6, 6],
+                            mlp_ratio=2, upsampler='nearest+conv', resi_connection='1conv')
     param_key_g = 'params_ema'
 
     pretrained_model = torch.load(sr_model_path)
@@ -131,8 +131,8 @@ def yolov5s_detect(yolo_model_path, image) :
 
     if yolo_model_path is None:
       
-      url = "https://drive.google.com/uc?id=10QsgZtVycx7i_6QtW_ly_NXZrTkVIPut"
-      output = "yolov5l_detection.pt"
+      url = "https://drive.google.com/uc?id=1-50CEkvUt4djEVD4lLVRiKOWh6GckV2_"
+      output = "yolov5L6_detection.pt"
 
       if not os.path.exists('/content/OCR-yolov5-SwinIR-STARNet/pt_models/'+output):
         
@@ -148,7 +148,7 @@ def yolov5s_detect(yolo_model_path, image) :
 
     data_img = image
 
-    results = model(data_img, size = 640)
+    results = model(data_img, size = 960)
     print('탐지된 이미지의 수 : ',len(results.xyxy[0]))
     
     crop_images = []
