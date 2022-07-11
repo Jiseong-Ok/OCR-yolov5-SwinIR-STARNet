@@ -143,7 +143,7 @@ def yolov5s_detect(yolo_model_path, image) :
       yolo_model_path = yolo_model_path
 
     model = torch.hub.load('ultralytics/yolov5', 'custom', path=yolo_model_path)
-    model.conf = 0.01
+    model.conf = 0.005
     model.iou = 0.01
 
     data_img = image
@@ -259,6 +259,7 @@ def demo(opt):
 
     for file_name in os.listdir(opt.image_folder):
         img = cv2.imread(opt.image_folder+'/'+file_name)
+        img_h_, img_w_ = img.shape[0], img.shape[1]
         start = time.time()
         crop_images, bboxs = yolov5s_detect(opt.yolo_model_path, image = img)
         end = time.time()
@@ -270,7 +271,10 @@ def demo(opt):
         texts = []
         for crop_image in crop_images:
             start = time.time()
-            sr_img = sr(opt.sr_model_path, image = crop_image)
+            if img_h_ < 300 or img_w_ < 300 :
+                sr_img = sr(opt.sr_model_path, image = crop_image)
+            else:
+                sr_img = crop_image
             end = time.time()
             super_resolution+=(end-start)
 
