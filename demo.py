@@ -83,45 +83,58 @@ def sr(sr_model_path, image, scale = 2, window_size=8):
     return output
 
 
-
-def itt(itt_model_path, batch_max_length, batch_size, imgW, imgH, character, image):
-
+def itt_model(itt_model_path, character):
     if itt_model_path is None:
-      
-      url = "https://drive.google.com/uc?id=1-YU62Q-yIap3yg6u7CCulP58fLS0QdZR"
-      output = "best_recognition.pth"
+    
+        url = "https://drive.google.com/uc?id=1-YU62Q-yIap3yg6u7CCulP58fLS0QdZR"
+        output = "best_recognition.pth"
 
-      if not os.path.exists('/content/OCR-yolov5-SwinIR-STARNet/pt_models/'+output):
-        
-        itt_model_path = gdown.download(url, './pt_models/'+output, quiet=False)
-      itt_model_path = '/content/OCR-yolov5-SwinIR-STARNet/pt_models/'+output
-      
-        
+        if not os.path.exists('/content/OCR-yolov5-SwinIR-STARNet/pt_models/'+output):
+    
+            itt_model_path = gdown.download(url, './pt_models/'+output, quiet=False)
+        itt_model_path = '/content/OCR-yolov5-SwinIR-STARNet/pt_models/'+output
     else:
-      itt_model_path = itt_model_path
+        itt_model_path = itt_model_path
+    
+    model = Model()
+    model = torch.nn.DataParallel(model).to(device)
 
+    model.load_state_dict(torch.load(itt_model_path, map_location=device))
+    # model.eval()
+
+    converter = CTCLabelConverter(character)
+
+    return model, converter
+
+
+
+
+def itt(model, batch_max_length, batch_size, imgW, imgH, character, image, converter):
+
+    
     image=Image.fromarray(image)
     transform = ResizeNormalize((imgW, imgH)) 
     image_tensors = transform(image)
     image_tensors = image_tensors.reshape(-1, 1, imgH, imgW)
 
-    model = Model()
-    model = torch.nn.DataParallel(model).to(device)
-
-    model.load_state_dict(torch.load(itt_model_path, map_location=device))
-    model.eval()
-
-    converter = CTCLabelConverter(character)
-
+   
+    # converter = CTCLabelConverter(character)
+    
+    
+   
     with torch.no_grad():
         image = image_tensors.to(device)
         text_for_pred = torch.LongTensor(batch_size, batch_max_length + 1).fill_(0).to(device)
 
         preds = model(image, text_for_pred)
+              
         preds_size = torch.IntTensor([preds.size(1)] * batch_size)
         _, preds_index = preds.max(2)
         # preds_index = preds_index.view(-1)
-        preds_str = converter.decode(preds_index, preds_size)   
+        preds_str = converter.decode(preds_index, preds_size)
+
+        end = time.time()
+        
     
     return preds_str
 
@@ -143,7 +156,7 @@ def yolov5s_detect(yolo_model_path, image) :
       yolo_model_path = yolo_model_path
 
     model = torch.hub.load('ultralytics/yolov5', 'custom', path=yolo_model_path)
-    model.conf = 0.005
+    model.conf = 0.004
     model.iou = 0.01
 
     data_img = image
@@ -257,6 +270,9 @@ def demo(opt):
     except OSError:
         print("Error: Failed to create the directory.")
 
+    model, converter = itt_model(opt.itt_model_path, opt.character)
+    
+    model.eval()
     for file_name in os.listdir(opt.image_folder):
         img = cv2.imread(opt.image_folder+'/'+file_name)
         img_h_, img_w_ = img.shape[0], img.shape[1]
@@ -269,6 +285,8 @@ def demo(opt):
 
 
         texts = []
+        trans_time_ = 0
+        model_time_ = 0
         for crop_image in crop_images:
             start = time.time()
             if img_h_ < 300 or img_w_ < 300 :
@@ -278,11 +296,14 @@ def demo(opt):
             end = time.time()
             super_resolution+=(end-start)
 
-            start = time.time()
-            text = itt(opt.itt_model_path, opt.batch_max_length, opt.batch_size, opt.imgW, opt.imgH, opt.character, image = sr_img)
-            end = time.time()
-            text_recognition+=(end-start)
+            start_r = time.time()
 
+            text = itt(model, opt.batch_max_length, opt.batch_size, opt.imgW, opt.imgH, opt.character, 
+            image = sr_img, converter = converter)
+
+            end_r = time.time()
+            text_recognition+=end_r-start_r
+           
             texts.append(text)
 
         img_t = img_blur_text(opt.font_path, image=img, bboxs=bboxs, texts=texts)
@@ -290,9 +311,12 @@ def demo(opt):
         img_t = cv2.cvtColor(img_t, cv2.COLOR_BGR2RGB)
         cv2.imwrite(f'./results/'+file_name, img_t)
 
+        
+
         print(f"Text Detection Spend Time : { text_detection :.5f} sec")
         print(f"Super Resolution Spend Time : { super_resolution :.5f} sec")
         print(f"Text Recognition Spend Time : { text_recognition :.5f} sec")
+       
 
     
 
