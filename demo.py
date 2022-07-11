@@ -275,7 +275,7 @@ def demo(opt):
     model.eval()
     for file_name in os.listdir(opt.image_folder):
         img = cv2.imread(opt.image_folder+'/'+file_name)
-        img_h_, img_w_ = img.shape[0], img.shape[1]
+        # img_h_, img_w_ = img.shape[0], img.shape[1]
         start = time.time()
         crop_images, bboxs = yolov5s_detect(opt.yolo_model_path, image = img)
         end = time.time()
@@ -287,9 +287,13 @@ def demo(opt):
         texts = []
         trans_time_ = 0
         model_time_ = 0
+        sr_cnt_ = 0
         for crop_image in crop_images:
             start = time.time()
-            if img_h_ < 300 or img_w_ < 300 :
+            img_h_, img_w_ = crop_image.shape[0], crop_image.shape[1]
+            
+            if img_h_ < 32 and img_w_ < 100 :
+                
                 sr_img = sr(opt.sr_model_path, image = crop_image)
             else:
                 sr_img = crop_image
@@ -305,7 +309,7 @@ def demo(opt):
             text_recognition+=end_r-start_r
            
             texts.append(text)
-
+        
         img_t = img_blur_text(opt.font_path, image=img, bboxs=bboxs, texts=texts)
         
         img_t = cv2.cvtColor(img_t, cv2.COLOR_BGR2RGB)
