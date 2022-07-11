@@ -37,10 +37,10 @@ def sr(sr_model_path, image, scale = 2, window_size=8):
       url = "https://drive.google.com/uc?id=1RfN1HefvnF75p7fWy7cQRMrJquQvLjL0"
       output = "003_realSR_BSRGAN_DFO_s64w8_SwinIR-M_x2_GAN"
 
-      if not os.path.exists('/content/OCR-Yolov5-SwinIR-SVTR/pt_models/'+output):
+      if not os.path.exists('/content/OCR-yolov5-SwinIR-STARNet/pt_models/'+output):
         
         sr_model_path = gdown.download(url, './pt_models/'+output, quiet=False)
-      sr_model_path = '/content/OCR-Yolov5-SwinIR-SVTR/pt_models/'+output
+      sr_model_path = '/content/OCR-yolov5-SwinIR-STARNet/pt_models/'+output
       
         
     else:
