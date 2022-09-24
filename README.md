@@ -1,6 +1,7 @@
 # OCR-yolov5-SwinIR-STARNet
 OCR(Korean)
-
+</br>
+[OCR.pdf](./Project1-OCR.pdf)
 
 ## Run demo
 
